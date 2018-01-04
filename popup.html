@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Soundcloud Scroll Down</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/plugin.css" rel="stylesheet">
+	</head>
+	<body>
+		<div id="container" class="container">
+			<div class="row">
+				<div class="col-lg-12 sc-separator">
+					<div class="row">
+						<div class="col-xs-8">
+							<h5 id="headline">Soundcloud Scroll Down</h5>
+						</div>
+						<div class="col-xs-4 pull-right">
+							<select id="dropdownLang" class="sc-button btn-block">
+								<option value="eng">English</option>
+								<option value="ger">Deutsch</option>
+								<option value="rus">Русский</option>
+							</select>
+						</div>
+					</div>
+			</div>
+		</div>
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group">
+						<span id="goTo">Go to posts: </span>
+						<strong id="goToDate"></strong>
+						<span id="ago"></span>
+					</div>
+				</div>
+				<div class="col-lg-12">
+					<form>
+						<div class="form-group">
+							<div class="row">
+								<div class="col-xs-8"><select id="dropdownDays" class="sc-button btn-block"></select></div>
+								<div class="col-xs-4"><button id="submitButton" class="sc-button sc-button-cta btn-block">Go</button></div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="scripts/jquery.min.js"></script>
+	<script src="scripts/bootstrap.min.js"></script>
+	<script src="popup.js"></script>
+</html>

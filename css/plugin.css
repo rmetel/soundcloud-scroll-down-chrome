@@ -1,0 +1,62 @@
+body {
+    width: 400px;
+}
+
+h5 {
+    color: #f50;
+    font-size: 18px;
+}
+
+.sc-button {
+    display: inline-block;
+    position: relative;
+    height: 26px;
+    margin: 0;
+    border: 1px solid #e5e5e5;
+    border-radius: 3px;
+    background-color: #fff;
+    cursor: pointer;
+    color: #333;
+    font-size: 14px;
+    line-height: 20px;
+    white-space: nowrap;
+    font-family: "Interstate","Lucida Grande","Lucida Sans Unicode","Lucida Sans",Garuda,Verdana,Tahoma,sans-serif;
+    font-weight: 100;
+    text-align: center;
+    vertical-align: baseline;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    box-sizing: border-box;
+}
+
+select.sc-button {
+    text-align: left;
+}
+
+.sc-button-cta {
+    background-color: #f50;
+    border-color: #f50;
+    color: #fff;
+    outline: none;
+}
+
+.sc-separator {
+    border-bottom: 1px solid #f2f2f2;
+}
+
+.form-group {
+    margin-top: 15px;
+}
+
+select#dropdownLang {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+#goTo,
+#goToDate,
+#ago {
+    font-style: italic;
+    color: #f50;
+}

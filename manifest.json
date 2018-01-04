@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "Soundcloud Scroll Down",
+  "short_name": "SC Scroll Down",
+  "description": "This extension allows the user to scroll down the page automatically to posts by selecting desired date.",
+  "version": "1.5",
+
+  "browser_action": {
+    "default_icon": "img/icon128.png",
+    "default_popup": "popup.html"
+  },
+
+  "icons": {
+    "48": "img/icon48.png"
+  },
+
+  "permissions": [
+    "activeTab",
+    "storage",
+	"http://*/",
+	"https://*/"
+  ]
+}
