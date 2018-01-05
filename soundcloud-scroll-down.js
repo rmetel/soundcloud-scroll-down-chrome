@@ -13,16 +13,15 @@ function scrollSc() {
         lastPost = allPosts[allPosts.length - 1],
         lastPostDateMilliseconds = new Date(lastPost.getAttribute('datetime')).getTime();
 
-    if (lastPostDateMilliseconds <= desiredDateMilliseconds) {
-        // Desired date found, cancel scrolling
+    if(lastPostDateMilliseconds <= desiredDateMilliseconds) {
+        // Cancel scrolling
         clearInterval(interval);
-
         // Notify extension
-        chrome.runtime.sendMessage({message: "stopped"});
+        notifyExtensionScrollingStopped();
 
         // Adjust the page, scroll to first post within desired date
         for (i = allPosts.length - 1; i > 0; i--) {
-            if (new Date(allPosts[i].getAttribute('datetime')).getTime() >= desiredDateMilliseconds) {
+            if(new Date(allPosts[i].getAttribute('datetime')).getTime() >= desiredDateMilliseconds) {
                 if(i < (allPosts.length - 1)) i++; // Go back to previous item
 
                 allPosts[i].scrollIntoView();
@@ -33,9 +32,20 @@ function scrollSc() {
     }
 }
 
+/**
+ * Notifies extension about stopped scrolling
+ */
+function notifyExtensionScrollingStopped(){
+    chrome.runtime.sendMessage({'message': 'stopped'});
+}
+
+// Listen for messages from extension
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if(request.message == 'stop') {
+        // Cancel scrolling
         clearInterval(interval);
+        // Notify extension
+        notifyExtensionScrollingStopped();
     }
 });
 
@@ -48,7 +58,7 @@ chrome.storage.sync.get('desiredDate', (items) => {
         lastPost = allPosts[allPosts.length - 1],
         lastPostDateMilliseconds = new Date(lastPost.getAttribute('datetime')).getTime();
 
-    // If last post date is smaller than the desired date, it means the needed item is already on page
+    // If last post date is smaller than the desired date (last post is older that the desired one), it means the needed item is already on page
     if (lastPostDateMilliseconds <= desiredDateMilliseconds) {
         // Adjust the page, scroll to first post within desired date
         for (i = allPosts.length - 1; i > 0; i--) {
@@ -60,6 +70,8 @@ chrome.storage.sync.get('desiredDate', (items) => {
                 break;
             }
         }
+        // Notify extension
+        notifyExtensionScrollingStopped();
     } else {
         // Start scrolling down the page
         interval = setInterval(scrollSc, 100);

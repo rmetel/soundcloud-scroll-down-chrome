@@ -276,13 +276,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if(url.indexOf("soundcloud.com/stream") > -1){
                 chrome.storage.sync.set({desiredDate: desiredDate}, () => {
                     if(!isRunning) {
+                        isRunning = true;
                         chrome.tabs.executeScript({file: 'soundcloud-scroll-down.js'});
                         submitButton.html(texts.cancel[selectedLanguage]);
                     } else {
                         chrome.tabs.sendMessage(tab.id, {'message': 'stop'});
-                        submitButton.html(texts.search[selectedLanguage]);
                     }
-                    isRunning = !isRunning;
                 });
             }
         });
