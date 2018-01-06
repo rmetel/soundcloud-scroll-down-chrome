@@ -2,17 +2,18 @@
 
 var ago = $('#ago'),
     dropdownLang = $('#dropdownLang'),
+    dropdownPeriod = $('#dropdownPeriod'),
     dropdownDays = $('#dropdownDays'),
     goTo = $('#goTo'),
     goToDate = $('#goToDate'),
-    defaultLanguage = 'eng',
     isRunning = false,
     languageSupport = {
         'eng': 'English',
         'ger': 'Deutsch',
         'rus': 'Русский'
     },
-    selectedLanguage = '',
+    selectedLanguage = 'eng',
+    selectedPeriod = 'd',
     selectedDate = 1,
     submitButton = $('#submitButton'),
     tab,
@@ -27,14 +28,14 @@ var ago = $('#ago'),
             'rus': 'Отменить'
         },
         'day': {
-            'eng': 'day',
-            'ger': 'Tag',
-            'rus': 'день'
+            'eng': {'default': 'day', 'optional': 'day'},
+            'ger': {'default': 'Tag', 'optional': 'Tag'},
+            'rus': {'default': 'день', 'optional': 'дня'}
         },
         'days': {
             'eng': {'default': 'days', 'optional': 'days'},
             'ger': {'default': 'Tage', 'optional': 'Tagen'},
-            'rus': {'default': 'дней', 'optional': 'дня'}
+            'rus': {'default': 'дни', 'optional': 'дней'}
         },
         'goto': {
             'eng': 'Find posts ',
@@ -42,14 +43,14 @@ var ago = $('#ago'),
             'rus': 'Найти посты ',
         },
         "month" : {
-            "eng": "month",
-            "ger": "Monat",
-            "rus": "месяц"
+            "eng": {'default': 'month', 'optional': 'month'},
+            "ger": {'default': 'Monat', 'optional': 'Monat'},
+            "rus": {'default': 'месяц', 'optional': 'месяца'}
         },
         "months" : {
-            "eng": "months",
-            "ger": "Monate",
-            "rus": "месяцы"
+            "eng": {'default': 'months', 'optional': 'months'},
+            "ger": {'default': 'Monate', 'optional': 'Monaten'},
+            "rus": {'default': 'месяцы', 'optional': 'месяцев'}
         },
         'search': {
             'eng': 'Search',
@@ -132,29 +133,36 @@ function getStorage(param, callback) {
 function changeTexts(language) {
     var dayNumber = parseInt(dropdownDays.val().split("_")[0]),
         dayText = " ",
-        agoText = " " + texts.ago[language];
+        agoText = " " + texts.ago[language],
+        period = selectedPeriod == 'd' ? 'day' : 'month';
+
+    if(dayNumber > 1) {
+        period += 's';
+    }
 
     switch(language){
         case "ger":
             if(dayNumber == 1)
-                dayText += texts.day[language];
+                dayText += texts[period][language]['default'];
             else
-                dayText += texts.days[language]['optional'];
+                dayText += texts[period][language]['optional'];
             agoText = "";
             break;
         case "rus":
-            if(dayNumber == 1)
-                dayText += texts.day[language];
-            else if(dayNumber == 2 || dayNumber == 3 || dayNumber == 4 || dayNumber == 22 || dayNumber == 23 || dayNumber == 24)
-                dayText += texts.days[language]['optional'];
-            else
-                dayText += texts.days[language]['default'];
+            if(dayNumber == 1) {
+                dayText += texts[period][language]['default'];
+            } else if(dayNumber == 2 || dayNumber == 3 || dayNumber == 4 || dayNumber == 22 || dayNumber == 23 || dayNumber == 24) {
+                period = period.substr(0, period.length - 1);
+                dayText += texts[period][language]['optional'];
+            } else {
+                dayText += texts[period][language]['optional'];
+            }
             break;
         default:
             if(dayNumber == 1)
-                dayText += texts.day[language];
+                dayText += texts[period][language]['default'];
             else
-                dayText += texts.days[language]['default'];
+                dayText += texts[period][language]['default'];
             break;
     }
 
@@ -177,23 +185,27 @@ function fillDropdownLanguage() {
 }
 
 /**
+ * Fills dropdown with period types
+ */
+function fillDropdownPeriod(language) {
+    dropdownPeriod.html('');
+    dropdownPeriod.append("<option value='d' selected>" + texts.days[language]['default'] + "</option>");
+    dropdownPeriod.append("<option value='m'>" + texts.months[language]['default'] + "</option>");
+}
+
+/**
  * Fills dropdown with days
  */
 function fillDropdownDays(language) {
-    var day = texts.day[language], days;
+    var day = texts.day[language]['default'],
+        option,
+        period = selectedPeriod == 'd' ? 30 : 12;
 
     dropdownDays.html('');
-    for(i = 1; i <= 30; i++){
-        days = texts.days[language]['default'];
-
-        // Handle special cases
-        switch(language){
-            case 'rus':
-                if(i == 2 || i == 3 || i == 4 || i == 22 || i == 23 || i == 24)
-                    days = texts.days[language].optional;
-                break;
-        }
-        dropdownDays.append("<option value='" + i + "_d'" + ((i == 1) ? " selected" : "") + ">" + i + " " + ((i == 1) ? day : days) + "</option>");
+    for(i = 1; i <= period; i++){
+        option = $('<option/>', {'value': i, 'text': i});
+        if(i == 1) option.attr('selected', '');
+        dropdownDays.append(option);
     }
 }
 
@@ -206,11 +218,11 @@ function calcDate(date){
     var now = new Date(),
         ms,
         pair = date.split("_"),
-        key = pair[1],
+        period = pair[1],
         value = pair[0],
         past;
 
-    switch(key){
+    switch(period){
         case "d":
             ms = now.setHours(now.getHours() - (value * 24));
             break;
@@ -238,20 +250,26 @@ function init() {
     fillDropdownLanguage();
 
     getStorage('language', (language) => {
-        if(!language)
-            selectedLanguage = defaultLanguage;
-        else
+        if(language)
             selectedLanguage = language;
 
         dropdownLang.val(selectedLanguage);
 
-        getStorage('date', (date) => {
-            fillDropdownDays(selectedLanguage);
-            if(date) {
-                selectedDate = date;
-                dropdownDays.val(selectedDate);
-            }
-            changeTexts(selectedLanguage);
+        getStorage('period', (period) => {
+            if(period)
+                selectedPeriod = period;
+
+            fillDropdownPeriod(selectedLanguage);
+            dropdownPeriod.val(selectedPeriod);
+
+            getStorage('date', (date) => {
+                fillDropdownDays(selectedLanguage);
+                if(date) {
+                    selectedDate = date;
+                    dropdownDays.val(selectedDate);
+                }
+                changeTexts(selectedLanguage);
+            });
         });
     });
 }
@@ -272,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Submit button listener
         submitButton.on('click', (e) => {
             e.preventDefault();
-            var desiredDate = calcDate(dropdownDays.val());
+            var desiredDate = calcDate(dropdownDays.val() + "_" + dropdownPeriod.val());
             if(url.indexOf("soundcloud.com/stream") > -1){
                 chrome.storage.sync.set({desiredDate: desiredDate}, () => {
                     if(!isRunning) {
@@ -286,17 +304,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Change language listener
+        // Language dropdown listener
         dropdownLang.on('change', (e) => {{}
             selectedLanguage = e.target.value;
             chrome.storage.sync.set({language: selectedLanguage}, () => {
+                fillDropdownPeriod(selectedLanguage);
+                dropdownPeriod.val(selectedPeriod);
                 fillDropdownDays(selectedLanguage);
                 dropdownDays.val(selectedDate);
                 changeTexts(selectedLanguage);
             });
         });
 
-        // Change date listener
+        // Date dropdown listener
+        dropdownPeriod.on('change', (e) => {{}
+            selectedPeriod = e.target.value;
+            chrome.storage.sync.set({period: selectedPeriod}, () => {});
+            fillDropdownDays(selectedLanguage);
+            changeTexts(selectedLanguage);
+        });
+
+        // Date dropdown listener
         dropdownDays.on('change', (e) => {{}
             selectedDate = e.target.value;
             chrome.storage.sync.set({date: selectedDate}, () => {});
