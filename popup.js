@@ -177,12 +177,11 @@ function changeTexts(language) {
             break;
     }
 
-    if(language == 'tur'){
+    if(language == 'tur') {
       goTo.html(dayNumber + dayText);
       goToDate.html(agoText);
       ago.html(texts.goto[language]);
-    }
-    else{
+    } else {
       goTo.html(texts.goto[language]);
       goToDate.html(dayNumber + dayText);
       ago.html(agoText);
