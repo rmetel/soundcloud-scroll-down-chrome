@@ -11,62 +11,72 @@ var ago = $('#ago'),
         'eng': 'English',
         'ger': 'Deutsch',
         'rus': 'Русский',
-        'lol': 'lol'
+        'tur': 'Türkçe'
     },
     selectedLanguage = 'eng',
-//    selectedPeriod = 'd',
+    selectedPeriod = 'd',
     selectedDate = 1,
     submitButton = $('#submitButton'),
     tab,
-//    texts = {
+    texts = {
         'ago': {
             'eng': 'ago',
             'rus': 'назад',
+            'tur': 'önceki'
         },
         'cancel': {
             'eng': 'Сancel',
             'ger': 'Abbrechen',
-            'rus': 'Отменить'
+            'rus': 'Отменить',
+            'tur': 'Iptal'
         },
         'day': {
             'eng': {'default': 'day', 'optional': 'day'},
             'ger': {'default': 'Tag', 'optional': 'Tag'},
-            'rus': {'default': 'день', 'optional': 'дня'}
+            'rus': {'default': 'день', 'optional': 'дня'},
+            'tur': {'default': 'gün', 'optional': 'gün'}
         },
         'days': {
             'eng': {'default': 'days', 'optional': 'days'},
             'ger': {'default': 'Tage', 'optional': 'Tagen'},
-            'rus': {'default': 'дни', 'optional': 'дней'}
+            'rus': {'default': 'дни', 'optional': 'дней'},
+            'tur': {'default': 'gün', 'optional': 'gün'}
         },
         'goto': {
             'eng': 'Find posts ',
             'ger': 'Finde Posts vor ',
             'rus': 'Найти посты ',
+            'tur': 'şarkıları bul '
         },
         "month" : {
             "eng": {'default': 'month', 'optional': 'month'},
             "ger": {'default': 'Monat', 'optional': 'Monat'},
-            "rus": {'default': 'месяц', 'optional': 'месяца'}
+            "rus": {'default': 'месяц', 'optional': 'месяца'},
+            "tur": {'default': 'ay', 'optional': 'ay'}
         },
         "months" : {
             "eng": {'default': 'months', 'optional': 'months'},
             "ger": {'default': 'Monate', 'optional': 'Monaten'},
-            "rus": {'default': 'месяцы', 'optional': 'месяцев'}
+            "rus": {'default': 'месяцы', 'optional': 'месяцев'},
+            "tur": {'default': 'ay', 'optional': 'ay'}
         },
         'search': {
             'eng': 'Search',
             'ger': 'Suchen',
             'rus': 'Найти',
+            'tur': 'Ara'
         },
         "week" : {
             "eng": "week",
             "ger": "Woche",
-            "rus": "неделя"
+            "rus": "неделя",
+            "tur": "hafta"
         },
         "weeks" : {
             "eng": "weeks",
             "ger": "Wochen",
-            "rus": "недели"
+            "rus": "недели",
+            "tur": "hafta"
         }
     },
     url;
@@ -167,9 +177,17 @@ function changeTexts(language) {
             break;
     }
 
-    goTo.html(texts.goto[language]);
-    goToDate.html(dayNumber + dayText);
-    ago.html(agoText);
+    if(language == 'tur'){
+      goTo.html(dayNumber + dayText);
+      goToDate.html(agoText);
+      ago.html(texts.goto[language]);
+    }
+    else{
+      goTo.html(texts.goto[language]);
+      goToDate.html(dayNumber + dayText);
+      ago.html(agoText);
+    }
+
     submitButton.html(texts.search[language]);
 }
 
