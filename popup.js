@@ -10,14 +10,15 @@ var ago = $('#ago'),
     languageSupport = {
         'eng': 'English',
         'ger': 'Deutsch',
-        'rus': 'Русский'
+        'rus': 'Русский',
+        'lol': 'lol'
     },
     selectedLanguage = 'eng',
-    selectedPeriod = 'd',
+//    selectedPeriod = 'd',
     selectedDate = 1,
     submitButton = $('#submitButton'),
     tab,
-    texts = {
+//    texts = {
         'ago': {
             'eng': 'ago',
             'rus': 'назад',
