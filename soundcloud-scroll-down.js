@@ -2,9 +2,9 @@
 // Email: ralph.metel@gmail.com
 // For free use
 
-var interval, desiredDate, desiredDateMilliseconds, extensionId;
+var interval, desiredDate, desiredDateMilliseconds;
 
-function scrollSc() {
+function scrollPage() {
     scrollTo({
         'top': document.body.scrollHeight
     });
@@ -74,6 +74,6 @@ chrome.storage.sync.get('desiredDate', (items) => {
         notifyExtensionScrollingStopped();
     } else {
         // Start scrolling down the page
-        interval = setInterval(scrollSc, 100);
+        interval = setInterval(scrollPage, 100);
     }
 });
