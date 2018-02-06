@@ -290,6 +290,8 @@ function init() {
             });
         });
     });
+
+    dropdownPeriod.focus();
 }
 
 // This extension loads the saved background color for the current tab if one
