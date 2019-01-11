@@ -3,16 +3,16 @@
   "name": "SoundCloud Scroll Down",
   "short_name": "SC Scroll Down",
   "description": "Scroll down your soundcloud stream automatically to a desired post by choosing a date!",
-  "version": "1.7.2",
+  "version": "1.7.3",
 
   "browser_action": {
-    "default_icon": "img/icon128.png",
+    "default_icon": "img/cloud-transparent.png",
     "default_popup": "popup.html",
     "default_title": "SoundCloud Scroll Down"
   },
 
   "icons": {
-    "48": "img/icon48.png"
+    "48": "img/cloud-transparent.png"
   },
 
   "permissions": [
