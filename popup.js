@@ -6,6 +6,7 @@ var ago = $('#ago'),
     dropdownDays = $('#dropdownDays'),
     goTo = $('#goTo'),
     goToDate = $('#goToDate'),
+    headline = $('#headline'),
     isRunning = false,
     languageSupport = {
         'eng': 'English',
@@ -292,6 +293,8 @@ function init() {
     });
 
     dropdownPeriod.focus();
+
+    chrome.tabs.executeScript({file: 'soundcloud-scroll-down.js'});
 }
 
 // This extension loads the saved background color for the current tab if one
@@ -314,9 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(url.indexOf("soundcloud.com/stream") > -1){
                 chrome.storage.sync.set({desiredDate: desiredDate}, () => {
                     if(!isRunning) {
-                        isRunning = true;
-                        chrome.tabs.executeScript({file: 'soundcloud-scroll-down.js'});
-                        submitButton.html(texts.cancel[selectedLanguage]);
+                        chrome.tabs.sendMessage(tab.id, {'message': 'start'});
                     } else {
                         chrome.tabs.sendMessage(tab.id, {'message': 'stop'});
                     }
@@ -353,9 +354,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if(request.message == "stopped") {
-         submitButton.html(texts.search[selectedLanguage]);
-         isRunning = false;
+chrome.runtime.onMessage.addListener(function(payload, sender, sendResponse) {
+    if(payload.message == "update") {
+        submitButton.text(payload.running ? texts.cancel[selectedLanguage] : texts.search[selectedLanguage]);
+        isRunning = payload.running;
     }
 });
