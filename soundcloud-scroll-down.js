@@ -6,13 +6,13 @@ var interval, desiredDate, desiredDateMilliseconds, isRunning = false;
 
 function scrollPage() {
     // permanent status check
-    isRunning = (document.getElementById("isScrolling").innerHTML === "true");
+    isRunning = getStatus();
 
     if(!isRunning) {
         // Cancel scrolling
         clearInterval(interval);
         isRunning = false;
-        document.getElementById("isScrolling").innerHTML = isRunning.toString();
+        setStatus(isRunning);
         sendStatus();
         return false;
     }
@@ -29,7 +29,7 @@ function scrollPage() {
         // Cancel scrolling
         clearInterval(interval);
         isRunning = false;
-        document.getElementById("isScrolling").innerHTML = isRunning.toString();
+        setStatus(isRunning);
         sendStatus();
 
         // Adjust the page, scroll to first post within desired date
@@ -50,6 +50,22 @@ function scrollPage() {
  */
 function sendStatus(){
     chrome.runtime.sendMessage({'message': 'update', 'running': isRunning});
+}
+
+/**
+ * Sets current plugin status
+ * @param {boolean} isRunning
+ */
+function setStatus(isRunning) {
+    document.getElementById("isRunning").setAttribute("value", isRunning);
+}
+
+/**
+ * Returns current plugin status (running or not)
+ * @return {boolean}
+ */
+function getStatus() {
+    return (document.getElementById("isRunning").getAttribute("value") === "true");
 }
 
 function startScrolling() {
@@ -78,7 +94,7 @@ function startScrolling() {
             // Start scrolling down the page
             interval = setInterval(scrollPage, 100);
             isRunning = true;
-            document.getElementById("isScrolling").innerHTML = isRunning.toString();
+            setStatus(isRunning);
             sendStatus();
         }
     });
@@ -87,15 +103,17 @@ function startScrolling() {
 /* Start execute code */
 /* ------------------------------------------------ */
 
-if(document.getElementById("isScrolling") == null) {
-    var node = document.createElement("div");
-    var textNode = document.createTextNode(isRunning.toString());
-    node.setAttribute("id", "isScrolling");
+if(document.getElementById("isRunning") === null) {
+    var node = document.createElement("input");
+    node.setAttribute("id", "isRunning");
+    node.setAttribute("value", isRunning.toString());
+    node.setAttribute("data-plugin", "SoundCloud ScrollDown");
+    node.setAttribute("data-author", "ralph.metel@gmail.com");
+    node.setAttribute("data-url", "https://chrome.google.com/webstore/detail/soundcloud-scrolldown/ljcpijkmgbnknjhepfbhekkmnhpnmbfp?hl=de&authuser=0");
     node.style.display = "none";
-    node.appendChild(textNode);
     document.body.appendChild(node);
 } else {
-    isRunning = (document.getElementById("isScrolling").innerHTML === "true");
+    isRunning = getStatus();
 }
 
 // notify extension about state
@@ -112,7 +130,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             // Cancel scrolling
             clearInterval(interval);
             isRunning = false;
-            document.getElementById("isScrolling").innerHTML = isRunning.toString();
+            setStatus(isRunning);
             sendStatus();
             break;
     }
