@@ -65,7 +65,11 @@ function setStatus(isRunning) {
  * @return {boolean}
  */
 function getStatus() {
-    return (document.getElementById("isRunning").getAttribute("value") === "true");
+    if (document.getElementById("isRunning") == null) {
+        return false;
+    } else {
+        return (document.getElementById("isRunning").getAttribute("value") === "true");
+    }
 }
 
 function startScrolling() {
@@ -111,7 +115,7 @@ if(document.getElementById("isRunning") === null) {
     node.setAttribute("data-author", "ralph.metel@gmail.com");
     node.setAttribute("data-url", "https://chrome.google.com/webstore/detail/soundcloud-scrolldown/ljcpijkmgbnknjhepfbhekkmnhpnmbfp?hl=de&authuser=0");
     node.style.display = "none";
-    document.body.appendChild(node);
+    document.body.prepend(node);
 } else {
     isRunning = getStatus();
 }
