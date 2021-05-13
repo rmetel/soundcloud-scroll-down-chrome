@@ -7,6 +7,7 @@ var ago = $('#ago'),
     goTo = $('#goTo'),
     goToDate = $('#goToDate'),
     headline = $('#headline'),
+    version = $('#version'),
     isRunning = false,
     languageSupport = {
         'eng': 'English',
@@ -291,6 +292,8 @@ function init() {
             });
         });
     });
+
+    version.text(chrome.runtime.getManifest().version);
 
     dropdownPeriod.focus();
 
