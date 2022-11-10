@@ -1,8 +1,8 @@
 // Copyright (c) 2017, Ralph Metel. All rights reserved.
 
 var ago = $('#ago'),
-    dropdownLang = $('#dropdownLang'),
-    dropdownPeriod = $('#dropdownPeriod'),
+    languagesDropDown = $('#languages'),
+    periodsDropDown = $('#periods'),
     dropdownDays = $('#dropdownDays'),
     goTo = $('#goTo'),
     goToDate = $('#goToDate'),
@@ -115,7 +115,7 @@ function getCurrentTabUrl(callback) {
     // "url" properties.
     console.assert(typeof url == 'string', 'tab.url should be a string');
 
-    callback(url);
+    callback(url, tab.id);
   });
 
   // Most methods of the Chrome extension APIs are asynchronous. This means that
@@ -195,11 +195,11 @@ function changeTexts(language) {
 /**
  * Fills language dropdown with possible languages
  */
-function fillDropdownLanguage() {
-    dropdownLang.html('');
+function fillLanguages() {
+    languagesDropDown.html('');
     var i = 0;
     for(key in languageSupport){
-        dropdownLang.append("<option value='" + key + "'" + ((i == 0) ? " selected" : "") + ">" + languageSupport[key] + "</option>");
+        languagesDropDown.append("<option value='" + key + "'" + ((i == 0) ? " selected" : "") + ">" + languageSupport[key] + "</option>");
         i++;
     }
 }
@@ -207,10 +207,10 @@ function fillDropdownLanguage() {
 /**
  * Fills dropdown with period types
  */
-function fillDropdownPeriod(language) {
-    dropdownPeriod.html('');
-    dropdownPeriod.append("<option value='d' selected>" + texts.days[language]['default'] + "</option>");
-    dropdownPeriod.append("<option value='m'>" + texts.months[language]['default'] + "</option>");
+function fillPeriods(language) {
+    periodsDropDown.html('');
+    periodsDropDown.append("<option value='d' selected>" + texts.days[language]['default'] + "</option>");
+    periodsDropDown.append("<option value='m'>" + texts.months[language]['default'] + "</option>");
 }
 
 /**
@@ -263,43 +263,6 @@ function calcDate(date){
     return past;
 };
 
-/**
- * Initially loads language and date (if exist) from storage
- */
-function init() {
-    fillDropdownLanguage();
-
-    getStorage('language', (language) => {
-        if(language)
-            selectedLanguage = language;
-
-        dropdownLang.val(selectedLanguage);
-
-        getStorage('period', (period) => {
-            if(period)
-                selectedPeriod = period;
-
-            fillDropdownPeriod(selectedLanguage);
-            dropdownPeriod.val(selectedPeriod);
-
-            getStorage('date', (date) => {
-                fillDropdownDays(selectedLanguage);
-                if(date) {
-                    selectedDate = date;
-                    dropdownDays.val(selectedDate);
-                }
-                changeTexts(selectedLanguage);
-            });
-        });
-    });
-
-    version.text(chrome.runtime.getManifest().version);
-
-    dropdownPeriod.focus();
-
-    chrome.tabs.executeScript({file: 'soundcloud-scroll-down.js'});
-}
-
 // This extension loads the saved background color for the current tab if one
 // exists. The user can select a new background color from the dropdown for the
 // current page, and it will be saved as part of the extension's isolated
@@ -309,15 +272,15 @@ function init() {
 // chrome.storage.local allows the extension data to be synced across multiple
 // user devices.
 document.addEventListener('DOMContentLoaded', () => {
-    getCurrentTabUrl((url) => {
+    getCurrentTabUrl((url, tabId) => {
         // Initialize drop down boxes
-        init();
+        init(tabId);
 
         // Submit button listener
         submitButton.on('click', (e) => {
             e.preventDefault();
-            var desiredDate = calcDate(dropdownDays.val() + "_" + dropdownPeriod.val());
-            if(url.indexOf("soundcloud.com/stream") > -1){
+            var desiredDate = calcDate(dropdownDays.val() + "_" + periodsDropDown.val());
+            if(url.indexOf("soundcloud.com/feed") > -1){
                 chrome.storage.sync.set({desiredDate: desiredDate}, () => {
                     if(!isRunning) {
                         chrome.tabs.sendMessage(tab.id, {'message': 'start'});
@@ -329,11 +292,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Language dropdown listener
-        dropdownLang.on('change', (e) => {{}
+        languagesDropDown.on('change', (e) => {{}
             selectedLanguage = e.target.value;
             chrome.storage.sync.set({language: selectedLanguage}, () => {
-                fillDropdownPeriod(selectedLanguage);
-                dropdownPeriod.val(selectedPeriod);
+                fillPeriods(selectedLanguage);
+                periodsDropDown.val(selectedPeriod);
                 fillDropdownDays(selectedLanguage);
                 dropdownDays.val(selectedDate);
                 changeTexts(selectedLanguage);
@@ -341,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Date dropdown listener
-        dropdownPeriod.on('change', (e) => {{}
+        periodsDropDown.on('change', (e) => {{}
             selectedPeriod = e.target.value;
             chrome.storage.sync.set({period: selectedPeriod}, () => {});
             fillDropdownDays(selectedLanguage);
@@ -356,6 +319,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+/**
+ * Gets language and date from local storage on load
+ */
+function init(tabId) {
+    fillLanguages();
+
+    getStorage('language', (language) => {
+        if(language)
+            selectedLanguage = language;
+
+        languagesDropDown.val(selectedLanguage);
+
+        getStorage('period', (period) => {
+            if(period)
+                selectedPeriod = period;
+
+            fillPeriods(selectedLanguage);
+            periodsDropDown.val(selectedPeriod);
+
+            getStorage('date', (date) => {
+                fillDropdownDays(selectedLanguage);
+                if(date) {
+                    selectedDate = date;
+                    dropdownDays.val(selectedDate);
+                }
+                changeTexts(selectedLanguage);
+            });
+        });
+    });
+
+    version.text(chrome.runtime.getManifest().version);
+
+    periodsDropDown.focus();
+
+    chrome.scripting.executeScript({
+      target: {tabId: tabId},
+      files: ['soundcloud-scroll-down.js']
+    });
+}
 
 chrome.runtime.onMessage.addListener(function(payload, sender, sendResponse) {
     if(payload.message == "update") {
